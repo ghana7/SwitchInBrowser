@@ -34,6 +34,8 @@ function particle(color, x, y, xvel, yvel, timer) {
 		ctx.arc(this.x, this.y, 2, 0, 2 * Math.PI, false);
 		ctx.fillStyle = this.color;
 		ctx.fill();
+		
+		
 	}
 }
 function component(radius, color, x, y, xvel, yvel, health) {
@@ -76,8 +78,28 @@ function component(radius, color, x, y, xvel, yvel, health) {
 		this.yvel += 2;
         
         ctx.beginPath();
-		ctx.arc(this.x, this.y, this.radius, 0, 2 * Math.PI, false);
 		ctx.fillStyle = this.color;
+		ctx.arc(this.x, this.y, this.radius, 0, 2 * Math.PI, false);
+		ctx.fill();
+		
+		ctx.beginPath();
+		ctx.fillStyle = "#FFF5C3";
+		ctx.arc(this.x, this.y, this.radius * 0.9, 0, 2 * Math.PI, false);
+		ctx.fill();
+		
+		ctx.beginPath();
+		ctx.rect(this.x - 50, this.y - 75, 100, 15);
+		ctx.fillStyle="#FF0000";
+		ctx.fill();
+		
+		ctx.beginPath();
+		ctx.rect(this.x - 50, this.y - 75, Math.max(this.health,0), 15);
+		ctx.fillStyle="#00FF00";
+		ctx.fill();
+		
+		ctx.beginPath();
+		ctx.rect(this.x - 50, this.y - 60, 20 * (5 - this.cooldown), 5);
+		ctx.fillStyle="#0000FF";
 		ctx.fill();
     }
 	this.checkCollision = function(otherComponent) {
@@ -90,23 +112,35 @@ function component(radius, color, x, y, xvel, yvel, health) {
 			if(!this.shielded) {
 				this.xvel = myVelocity * Math.cos(THETA);
 				this.yvel = myVelocity * Math.sin(THETA);
-				for(var p = 0; p < 100; p++) {
-					particles.push(new particle("gray",this.x,this.y,Math.random() * 20 - 10,Math.random() * 20 - 10, 1));
+				
+				for(var p = 0; p < myVelocity * 5; p++) {
+					particles.push(new particle(this.color,this.x,this.y,Math.random() * 20 - 10,Math.random() * 20 - 10, 1));
 				}
 			} else {
 				this.xvel = myVelocity * Math.cos(THETA) / 3;
 				this.yvel = myVelocity * Math.sin(THETA) / 3;
 				this.shielded = false;
-				for(var p = 0; p < myVelocity * 5; p++) {
-					particles.push(new particle(this.color,this.x,this.y,Math.random() * 20 - 10,Math.random() * 20 - 10, 1));
+				
+				for(var p = 0; p < 100; p++) {
+					particles.push(new particle("gray",this.x,this.y,Math.random() * 20 - 10,Math.random() * 20 - 10, 1));
 				}
 			}
 			
-			
-			otherComponent.xvel = otherVelocity * -Math.cos(THETA);
-			otherComponent.yvel = otherVelocity * -Math.sin(THETA);
-			for(var p = 0; p < otherVelocity * 5; p++) {
-				particles.push(new particle(otherComponent.color,otherComponent.x,otherComponent.y,Math.random() * 20 - 10,Math.random() * 10 - 5, 1));
+			if(!otherComponent.shielded) {
+				otherComponent.xvel = otherVelocity * -Math.cos(THETA);
+				otherComponent.yvel = otherVelocity * -Math.sin(THETA);
+				
+				for(var p = 0; p < otherVelocity * 5; p++) {
+					particles.push(new particle(otherComponent.color,otherComponent.x,otherComponent.y,Math.random() * 20 - 10,Math.random() * 20 - 10, 1));
+				}
+			} else {
+				otherComponent.xvel = otherVelocity * -Math.cos(THETA) / 3;
+				otherComponent.yvel = otherVelocity * -Math.sin(THETA) / 3;
+				otherComponent.shielded = false;
+				
+				for(var p = 0; p < 100; p++) {
+					particles.push(new particle("gray",otherComponent.x,otherComponent.y,Math.random() * 20 - 10,Math.random() * 20 - 10, 1));
+				}
 			}
 		}
 		
@@ -139,26 +173,26 @@ function playerSelect() {
 			if(i === 0) {
 				if(p1down < 0) {
 					player1char = (player1char + 1) % 4;
-					p1down = 3;
+					p1down = 7;
 				}
 				
 			} else { 
 				if(p2down < 0) {
 					player2char = (player2char + 1) % 4;
-					p2down = 3;
+					p2down = 7;
 				}
 			}
 		}
-		if(gamepads[i].axes[4].value === 5) {
+		if(gamepads[i].buttons[4].value === 1) {
 			if(i === 0) {
 				if(p1down < 0) {
-					player1char = (player1char - 1) % 4;
-					p1down = 3;
+					player1char = (player1char + 3) % 4;
+					p1down = 7;
 				}
 			} else {
 				if(p2down < 0) {
-					player2char = (player2char - 1) % 4;
-					p2down = 3;
+					player2char = (player2char + 3) % 4;
+					p2down = 7;
 				}
 			}
 		}
@@ -173,7 +207,6 @@ function playerSelect() {
 	player1boxes[player1char].style.borderColor = "black";
 	player2boxes[player2char].style.borderColor = "black";
 	if(gamepads[0].buttons[1].value === 1 && gamepads[1].buttons[1].value === 1) {
-		alert("stop");
 		clearInterval(playerSelectInterval);
 		startGame(colors[player1char],colors[player2char]);
 	}
@@ -243,8 +276,8 @@ function gameLoop() {
 			players[i].shielded = true;
 		}
 		if(players[i].color === "yellow") {
-			players[i].x += players[i].xvel*4;
-			players[i].y += players[i].yvel*4;
+			players[i].x += players[i].xvel*20;
+			players[i].y += players[i].yvel*5;
 		}
 	}
 	
