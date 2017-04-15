@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>Switch Controllers</title>
+	<link rel="stylesheet" href="stylesheet.css" type="text/css">
+	</head>
+	<body>
+		<canvas id="myCanvas" width="200" height="100" style="border:1px solid #000000;">
+		
+		</canvas> 
+	</body>
+</html>
