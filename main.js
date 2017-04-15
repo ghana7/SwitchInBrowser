@@ -44,6 +44,7 @@ function component(radius, color, x, y, xvel, yvel, health) {
 	this.yvel = yvel;
 	this.color = color;
 	this.cooldown = 5;
+	this.shielded = false;
 
 	this.health = health;
 	
@@ -86,11 +87,22 @@ function component(radius, color, x, y, xvel, yvel, health) {
 			var THETA = Math.atan2((this.y - otherComponent.y), (this.x - otherComponent.x));
 			//alert(THETA);
 			
-			this.xvel = myVelocity * Math.cos(THETA);
-			this.yvel = myVelocity * Math.sin(THETA);
-			for(var p = 0; p < myVelocity * 5; p++) {
-				particles.push(new particle(this.color,this.x,this.y,Math.random() * 20 - 10,Math.random() * 20 - 10, 1));
+			if(!this.shielded) {
+				this.xvel = myVelocity * Math.cos(THETA);
+				this.yvel = myVelocity * Math.sin(THETA);
+				for(var p = 0; p < 100; p++) {
+					particles.push(new particle("gray",this.x,this.y,Math.random() * 20 - 10,Math.random() * 20 - 10, 1));
+				}
+			} else {
+				this.xvel = myVelocity * Math.cos(THETA) / 3;
+				this.yvel = myVelocity * Math.sin(THETA) / 3;
+				this.shielded = false;
+				for(var p = 0; p < myVelocity * 5; p++) {
+					particles.push(new particle(this.color,this.x,this.y,Math.random() * 20 - 10,Math.random() * 20 - 10, 1));
+				}
 			}
+			
+			
 			otherComponent.xvel = otherVelocity * -Math.cos(THETA);
 			otherComponent.yvel = otherVelocity * -Math.sin(THETA);
 			for(var p = 0; p < otherVelocity * 5; p++) {
@@ -226,6 +238,13 @@ function gameLoop() {
 			for(var p = 0; p < 25; p++) {
 				particles.push(new particle("cyan",players[i].x,players[i].y,players[i].xvel + Math.random() * 10 - 5, players[i].yvel + Math.random() * 10 - 5, 3));
 			}
+		}
+		if(players[i].color === "green") {
+			players[i].shielded = true;
+		}
+		if(players[i].color === "yellow") {
+			players[i].x += players[i].xvel*4;
+			players[i].y += players[i].yvel*4;
 		}
 	}
 	
