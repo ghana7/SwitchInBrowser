@@ -113,8 +113,8 @@ function startPlayerSelect() {
 }
 var player1char = 0;
 var player2char = 0;
-var p1down = false;
-var p2down = false;
+var p1down = 0;
+var p2down = 0;
 function playerSelect() {
 	var gamepads = navigator.getGamepads ? navigator.getGamepads() : (navigator.webkitGetGamepads ? navigator.webkitGetGamepads : []);
 	console.log(gamepads);
@@ -125,31 +125,33 @@ function playerSelect() {
 	for (var i = 0; i < 2; i++) {
 		if(gamepads[i].buttons[5].value === 1) {
 			if(i === 0) {
-				if(p1down === false) {
+				if(p1down === 0) {
 					player1char = (player1char + 1) % 4;
-					p1down = true;
+					p1down = 3;
 				}
 				
 			} else { 
-				if(p2down === false) {
+				if(p2down === 0) {
 					player2char = (player2char + 1) % 4;
-					p2down = true;
+					p2down = 3;
 				}
 			}
 		}
 		if(gamepads[i].axes[4].value === 5) {
 			if(i === 0) {
-				if(p1down === false) {
+				if(p1down === 0) {
 					player1char = (player1char - 1) % 4;
-					p1down = true;
+					p1down = 3;
 				}
 			} else {
-				if(p2down === false) {
+				if(p2down === 0) {
 					player2char = (player2char - 1) % 4;
-					p2down = true;
+					p2down = 3;
 				}
 			}
 		}
+		p1down--;
+		p2down--;
 		
 	}
 	for(var j = 0; j < 4; j++) {
