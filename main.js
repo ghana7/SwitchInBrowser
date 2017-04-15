@@ -242,7 +242,7 @@ function playerSelect() {
 	if((gamepads[0].buttons[15].value === 1 && gamepads[1].buttons[1].value === 1) {
 		clearInterval(playerSelectInterval);
 		startGame(colors["black"],colors[player2char]);
-	} else if || if(gamepads[0].buttons[1].value === 1 && gamepads[1].buttons[15].value === 1) {
+	} else if(gamepads[0].buttons[1].value === 1 && gamepads[1].buttons[15].value === 1) {
 		clearInterval(playerSelectInterval);
 		startGame(colors[player1char],colors["black"]);
 	} else if(gamepads[0].buttons[1].value === 1 && gamepads[1].buttons[1].value === 1) {
