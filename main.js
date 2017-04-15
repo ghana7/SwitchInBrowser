@@ -137,13 +137,13 @@ function playerSelect() {
 	for (var i = 0; i < 2; i++) {
 		if(gamepads[i].buttons[5].value === 1) {
 			if(i === 0) {
-				if(p1down === 0) {
+				if(p1down < 0) {
 					player1char = (player1char + 1) % 4;
 					p1down = 3;
 				}
 				
 			} else { 
-				if(p2down === 0) {
+				if(p2down < 0) {
 					player2char = (player2char + 1) % 4;
 					p2down = 3;
 				}
@@ -151,12 +151,12 @@ function playerSelect() {
 		}
 		if(gamepads[i].axes[4].value === 5) {
 			if(i === 0) {
-				if(p1down === 0) {
+				if(p1down < 0) {
 					player1char = (player1char - 1) % 4;
 					p1down = 3;
 				}
 			} else {
-				if(p2down === 0) {
+				if(p2down < 0) {
 					player2char = (player2char - 1) % 4;
 					p2down = 3;
 				}
