@@ -1,5 +1,7 @@
 var buttonDict = {bottomB:0,rightB:1,leftB:2,topB:3,leftBumper:4,rightBumper:5,minus:8,plus:9,joyPush:10,home:13,sideBumper:14,sideTrigger:15};
 
+
+
 var myGameArea = {
     canvas : document.createElement("canvas"),
     start : function() {
@@ -21,6 +23,7 @@ function component(radius, color, x, y, xvel, yvel) {
 	this.xvel = xvel;
 	this.yvel = yvel;
 	this.color = color;
+	var health = 100;
     this.update = function(){
         ctx = myGameArea.context;
 		canvas = myGameArea.canvas;
@@ -37,10 +40,16 @@ function component(radius, color, x, y, xvel, yvel) {
 		if(this.x < this.radius) {
 			this.x = this.radius;
 			this.xvel *= -0.8;
+			health -= math.abs(xvel*3);
+			alert(health);
 		}
 		if(this.x > canvas.width - this.radius) {
 			this.x = canvas.width - this.radius;
 			this.xvel *= -0.8;
+			health -= math.abs(xvel*3);
+			alert(health);
+			
+			
 		}
 		this.xvel *= .95;
 		this.yvel += 2;
@@ -56,6 +65,7 @@ function component(radius, color, x, y, xvel, yvel) {
 			var otherVelocity = Math.sqrt(this.xvel * this.xvel + this.yvel * this.yvel);
 			var THETA = Math.atan2((this.y - otherComponent.y), (this.x - otherComponent.x));
 			//alert(THETA);
+			
 			this.xvel = myVelocity * Math.cos(THETA);
 			this.yvel = myVelocity * Math.sin(THETA);
 			
@@ -64,6 +74,7 @@ function component(radius, color, x, y, xvel, yvel) {
 		}
 	}
 }
+
 
 var players;
 function startGame() {
