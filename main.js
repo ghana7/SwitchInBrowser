@@ -21,6 +21,7 @@ function component(radius, color, x, y, xvel, yvel) {
 	this.xvel = xvel;
 	this.yvel = yvel;
 	this.color = color;
+	this.cooldown = 0;
     this.update = function(){
         ctx = myGameArea.context;
 		canvas = myGameArea.canvas;
@@ -99,6 +100,19 @@ function gameLoop() {
 	}
 	if(fixAxis(gamepads[i].axes[9]) === 5 || fixAxis(gamepads[i].axes[9]) === 6 || fixAxis(gamepads[i].axes[9]) === 7) {
 		players[i].xvel -= 0.5;
+	}
+	players[i].cooldown -= 0.02;
+	if(gamepads[i].buttons[1].value === 1 && players[i].cooldown === 0) {
+		players[i].cooldown = 5;
+		if(players[i].color === "red") {
+			players[i].xvel = 0;
+			players[i].yvel = 0;
+			alert("fuck assassins");
+		}
+		if(players[i].color === "blue") {
+			players[i].xvel *= 1.5;
+			players[i].yvel *= 1.5;
+		}
 	}
 	
 	
