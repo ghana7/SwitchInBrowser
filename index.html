@@ -5,7 +5,19 @@
 		<title>Switch Controllers</title>
 		<link rel="stylesheet" href="stylesheet.css" type="text/css">
 	</head>
-	<body onload="startGame()">
+	<body onload="startPlayerSelect()"> <!-- onload="startGame()" -->
+		<div id="player1">
+			<div class="charselect red"></div>
+			<div class="charselect blue"></div>
+			<div class="charselect yellow"></div>
+			<div class="charselect green"></div>
+		</div>
+		<div id="player2">
+			<div class="charselect red"></div>
+			<div class="charselect blue"></div>
+			<div class="charselect yellow"></div>
+			<div class="charselect green"></div>
+		</div>
 		<script src="main.js"></script>
 		<p id="score1">100</p>
 		<p id="score2">100</p>

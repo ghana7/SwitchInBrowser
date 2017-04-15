@@ -1,5 +1,6 @@
 var buttonDict = {bottomB:0,rightB:1,leftB:2,topB:3,leftBumper:4,rightBumper:5,minus:8,plus:9,joyPush:10,home:13,sideBumper:14,sideTrigger:15};
-
+var colors = ["red","blue","yellow","green"];
+var borders = ["FF9999","9999FF","99FF99","FFFF99"];
 
 
 var myGameArea = {
@@ -42,7 +43,6 @@ function component(radius, color, x, y, xvel, yvel, health) {
 	this.xvel = xvel;
 	this.yvel = yvel;
 	this.color = color;
-
 	this.cooldown = 5;
 
 	this.health = health;
@@ -89,12 +89,12 @@ function component(radius, color, x, y, xvel, yvel, health) {
 			this.xvel = myVelocity * Math.cos(THETA);
 			this.yvel = myVelocity * Math.sin(THETA);
 			for(var p = 0; p < myVelocity * 5; p++) {
-				particles.push(new particle(this.color,this.x,this.y,this.xvel + Math.random() * 20 - 10, this.yvel + Math.random() * 20 - 10, 3));
+				particles.push(new particle(this.color,this.x,this.y,Math.random() * 20 - 10,Math.random() * 20 - 10, 1));
 			}
 			otherComponent.xvel = otherVelocity * -Math.cos(THETA);
 			otherComponent.yvel = otherVelocity * -Math.sin(THETA);
 			for(var p = 0; p < otherVelocity * 5; p++) {
-				particles.push(new particle(otherComponent.color,otherComponent.x,otherComponent.y,otherComponent.xvel + Math.random() * 20 - 10, otherComponent.yvel + Math.random() * 10 - 5, 3));
+				particles.push(new particle(otherComponent.color,otherComponent.x,otherComponent.y,Math.random() * 20 - 10,Math.random() * 10 - 5, 1));
 			}
 		}
 		
@@ -105,8 +105,72 @@ function component(radius, color, x, y, xvel, yvel, health) {
 var players;
 var particles;
 
-function startGame() {
-    players = [new component(50,"red",200,500,0,0,100),new component(50,"blue",700,500,0,0,100)];
+
+var playerSelectInterval;
+
+function startPlayerSelect() {
+	playerSelectInterval = setInterval(playerSelect,20);
+}
+var player1char = 0;
+var player2char = 0;
+var p1down = false;
+var p2down = false;
+function playerSelect() {
+	var gamepads = navigator.getGamepads ? navigator.getGamepads() : (navigator.webkitGetGamepads ? navigator.webkitGetGamepads : []);
+	console.log(gamepads);
+	var player1boxes = document.getElementById("player1").children;
+	var player2boxes = document.getElementById("player2").children;
+	console.log(player1boxes);
+	console.log(player2boxes);
+	for (var i = 0; i < 2; i++) {
+		if(gamepads[i].buttons[5].value === 1) {
+			if(i === 0) {
+				if(p1down === false) {
+					player1char = (player1char + 1) % 4;
+					p1down = true;
+				}
+				
+			} else { 
+				if(p2down === false) {
+					player2char = (player2char + 1) % 4;
+					p2down = true;
+				}
+			}
+		}
+		if(gamepads[i].axes[4].value === 5) {
+			if(i === 0) {
+				if(p1down === false) {
+					player1char = (player1char - 1) % 4;
+					p1down = true;
+				}
+			} else {
+				if(p2down === false) {
+					player2char = (player2char - 1) % 4;
+					p2down = true;
+				}
+			}
+		}
+		
+	}
+	for(var j = 0; j < 4; j++) {
+		player1boxes[j].style.borderColor = colors[j];
+		player2boxes[j].style.borderColor = colors[j];
+	}
+	player1boxes[player1char].style.borderColor = "black";
+	player2boxes[player2char].style.borderColor = "black";
+	if(gamepads[0].buttons[1].value === 1 && gamepads[1].buttons[1].value === 1) {
+		alert("stop");
+		clearInterval(playerSelectInterval);
+		startGame(colors[player1char],colors[player2char]);
+	}
+}
+function startGame(color1, color2) {
+	var divsToHide = document.getElementsByClassName("charselect"); //divsToHide is an array
+    for(var i = 0; i < divsToHide.length; i++){
+        divsToHide[i].style.visibility = "hidden"; // or
+        divsToHide[i].style.display = "none"; // depending on what you're doing
+    }
+    players = [new component(50,color1,200,500,0,0,100),new component(50,color2,700,500,0,0,100)];
 	particles = [];
     myGameArea.start();
 }
@@ -116,7 +180,8 @@ function fixAxis(value) {
 }
 
 function gameLoop() {
-  var gamepads = navigator.getGamepads ? navigator.getGamepads() : (navigator.webkitGetGamepads ? navigator.webkitGetGamepads : []);
+	var gamepads = navigator.getGamepads ? navigator.getGamepads() : (navigator.webkitGetGamepads ? navigator.webkitGetGamepads : []);
+	console.log(gamepads);
   for (var i = 0; i < 2; i++) {
 	/*
 	console.log(gamepads[i]);
@@ -124,9 +189,9 @@ function gameLoop() {
 		console.log(gamepads[i].buttons[j].value);
 	}
 	console.log(gamepads[i].axes);
-	*/
 	console.log(gamepads[i].axes)
 	console.log(fixAxis(gamepads[i].axes[9]));
+	*/
 	
 	if(fixAxis(gamepads[i].axes[9]) === 3 || fixAxis(gamepads[i].axes[9]) === 4 || fixAxis(gamepads[i].axes[9]) === 5) {
 		players[i].yvel += 0.1;
@@ -146,7 +211,6 @@ function gameLoop() {
 	}
 	if(gamepads[i].buttons[1].value === 1 && players[i].cooldown === 0) {
 		players[i].cooldown = 5;
-		alert("kachow");
 		if(players[i].color === "red") {
 			players[i].xvel *= -0.1;
 			players[i].yvel *= -0.1;
@@ -161,8 +225,6 @@ function gameLoop() {
 				particles.push(new particle("cyan",players[i].x,players[i].y,players[i].xvel + Math.random() * 10 - 5, players[i].yvel + Math.random() * 10 - 5, 3));
 			}
 		}
-	} else {
-		//alert(players[i].cooldown);
 	}
 	
 	

@@ -4,3 +4,24 @@ canvas {
 	width:100%;
 	height:100%;
 }
+.red {
+	background-color: #FFCCCC;
+	border: 1vw solid #FF9999;
+}
+.blue {
+	background-color:#CCCCFF;
+	border: 1vw solid #9999FF;
+}
+.green {
+	background-color:#CCFFCC;
+	border: 1vw solid #99FF99;
+}
+.yellow {
+	background-color:#FFFFCC;
+	border: 1vw solid #FFFF99;
+}
+.charselect {
+	width:22vw;
+	height:22vw;
+	display:inline-block;
+}
