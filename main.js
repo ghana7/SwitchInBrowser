@@ -7,7 +7,7 @@ var myGameArea = {
     canvas : document.createElement("canvas"),
     start : function() {
         this.canvas.width = 1520;
-        this.canvas.height = 650;
+        this.canvas.height = 725;
         this.context = this.canvas.getContext("2d");
         document.body.insertBefore(this.canvas, document.body.childNodes[0]);
         this.interval = setInterval(gameLoop, 20);
@@ -31,7 +31,7 @@ function particle(color, x, y, xvel, yvel, timer) {
 		this.y += this.yvel;
 		this.timer -= 0.02;
 		ctx.beginPath();
-		ctx.arc(this.x, this.y, 2, 0, 2 * Math.PI, false);
+		ctx.arc(this.x, this.y, 3, 0, 2 * Math.PI, false);
 		ctx.fillStyle = this.color;
 		ctx.fill();
 		
@@ -90,17 +90,17 @@ function component(radius, color, x, y, xvel, yvel, health) {
 		ctx.fill();
 		
 		ctx.beginPath();
-		ctx.rect(this.x - 50, 615, 100, 15);
+		ctx.rect(this.x - 50, 690, 100, 15);
 		ctx.fillStyle="#FF0000";
 		ctx.fill();
 		
 		ctx.beginPath();
-		ctx.rect(this.x - 50, 615, Math.max(this.health,0), 15);
+		ctx.rect(this.x - 50, 690, Math.max(this.health,0), 15);
 		ctx.fillStyle="#00FF00";
 		ctx.fill();
 		
 		ctx.beginPath();
-		ctx.rect(this.x - 50, 640, 20 * (5 - this.cooldown), 5);
+		ctx.rect(this.x - 50, 715, 20 * (5 - this.cooldown), 5);
 		ctx.fillStyle="#0000FF";
 		ctx.fill();
 		
@@ -122,8 +122,13 @@ function component(radius, color, x, y, xvel, yvel, health) {
 				ctx.drawImage(crack2,this.x - 50, this.y - 50);
 				break;
 			case 0:
-			default:
+			case -1:
+			case -2:
+			case -3:
+			case -4:
 				ctx.drawImage(crack3,this.x - 50, this.y - 50);
+				break;
+			default:
 				break;
 		}
     }
@@ -242,10 +247,10 @@ function playerSelect() {
 	
 	if(gamepads[0].buttons[15].value === 1 && gamepads[1].buttons[1].value === 1) {
 		clearInterval(playerSelectInterval);
-		startGame(colors["black"],colors[player2char]);
+		startGame("black",colors[player2char]);
 	} else if(gamepads[0].buttons[1].value === 1 && gamepads[1].buttons[15].value === 1) {
 		clearInterval(playerSelectInterval);
-		startGame(colors[player1char],colors["black"]);
+		startGame(colors[player1char],"black");
 	} else if(gamepads[0].buttons[1].value === 1 && gamepads[1].buttons[1].value === 1) {
 		clearInterval(playerSelectInterval);
 		startGame(colors[player1char],colors[player2char]);
@@ -259,7 +264,7 @@ function startGame(color1, color2) {
     }
 	myGameArea.canvas.style.visibility = "visible";
 	myGameArea.canvas.style.display = "inline-block";
-    players = [new component(50,color1,200,500,0,0,100),new component(50,color2,700,500,0,0,100)];
+    players = [new component(50,color1,250,500,0,0,100),new component(50,color2,1000,500,0,0,100)];
 	particles = [];
     myGameArea.start();
 }
@@ -318,8 +323,20 @@ function gameLoop() {
 			players[i].shielded = true;
 		}
 		if(players[i].color === "yellow") {
+			var old = players[i].x;
+			var oldY = players[i].x;
 			players[i].x += players[i].xvel*20;
 			players[i].y += players[i].yvel*5;
+			for(var p = 0; p < 100; p++) {
+				var rand = Math.random();
+				particles.push(new particle("white",rand * old + (1 - rand) * players[i].x, rand * oldY + (1 - rand) * players[i].y, Math.random() * 4 - 2,Math.random() * 4 - 2, 1));
+			}
+		}
+		if(players[i].color === "black") {
+			players[i].health += 10;
+			for(var p = 0; p < 75; p++) {
+				particles.push(new particle("#00FF00",players[i].x,players[i].y,players[i].xvel + Math.random() * 10 - 5, players[i].yvel + Math.random() * 30 - 15, .5));
+			}
 		}
 	}
 	
@@ -337,20 +354,24 @@ function gameLoop() {
 	  }
   }
   players[0].checkCollision(players[1]); //change eventually to handle more players
-  
-  document.getElementById("score1").innerHTML = players[0].health;
-  document.getElementById("score2").innerHTML = players[1].health;
-  if(end > 0) {
-	  end = 0;
-	  alert("Player " + end + " wins!");
-	  clearInterval(myGameArea.interval);
-	  startPlayerSelect();
-  }
+
   
   if(players[0].health <= 0) {
-	  end = 1;
+	  for(var i = 0; i < players.length; i++) {
+	     players[i].update();
+	  }
+	  alert("Player 2 wins!");
+	  clearInterval(myGameArea.interval);
+	  end = 0;
+	  startPlayerSelect();
   }
   if(players[1].health <= 0) {
-	  end = 2;
+	  for(var i = 0; i < players.length; i++) {
+		players[i].update();
+	  }
+	  alert("Player 1 wins!");
+	  clearInterval(myGameArea.interval);
+	  end = 0;
+	  startPlayerSelect();
   }
 }
