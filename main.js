@@ -77,6 +77,8 @@ function component(radius, color, x, y, xvel, yvel, health) {
 		this.xvel *= .95;
 		this.yvel += 2;
         
+		
+		
         ctx.beginPath();
 		ctx.fillStyle = this.color;
 		ctx.arc(this.x, this.y, this.radius, 0, 2 * Math.PI, false);
@@ -109,7 +111,7 @@ function component(radius, color, x, y, xvel, yvel, health) {
 		var crack3 = new Image()
 		crack3.src = "Pictures\\crack_DMG3.png";
 		
-		switch(Math.round(this.health / 33)) {
+		switch(Math.floor(this.health / 33)) {
 			case 3:
 				
 				break;
@@ -120,6 +122,7 @@ function component(radius, color, x, y, xvel, yvel, health) {
 				ctx.drawImage(crack2,this.x - 50, this.y - 50);
 				break;
 			case 0:
+			default:
 				ctx.drawImage(crack3,this.x - 50, this.y - 50);
 				break;
 		}
@@ -177,6 +180,13 @@ var particles;
 var playerSelectInterval;
 
 function startPlayerSelect() {
+	var divsToHide = document.getElementsByClassName("charselect"); //divsToHide is an array
+    for(var i = 0; i < divsToHide.length; i++){
+        divsToHide[i].style.visibility = "visible"; // or
+        divsToHide[i].style.display = "inline-block"; // depending on what you're doing
+    }
+	myGameArea.canvas.style.display = "none";
+	myGameArea.canvas.style.visibility = "hidden";
 	playerSelectInterval = setInterval(playerSelect,20);
 }
 var player1char = 0;
@@ -246,6 +256,8 @@ function startGame(color1, color2) {
         divsToHide[i].style.visibility = "hidden"; // or
         divsToHide[i].style.display = "none"; // depending on what you're doing
     }
+	myGameArea.canvas.style.visibility = "visible";
+	myGameArea.canvas.style.display = "inline-block";
     players = [new component(50,color1,200,500,0,0,100),new component(50,color2,700,500,0,0,100)];
 	particles = [];
     myGameArea.start();
@@ -313,7 +325,7 @@ function gameLoop() {
 	
   }
   myGameArea.clear();
-  
+ 
   for(var i = 0; i < players.length; i++) {
 	  players[i].update();
   }
@@ -327,4 +339,14 @@ function gameLoop() {
   
   document.getElementById("score1").innerHTML = players[0].health;
   document.getElementById("score2").innerHTML = players[1].health;
+  if(players[0].health <= 0) {
+	  alert("Player 2 wins!");
+	  clearInterval(myGameArea.interval);
+	  startPlayerSelect();
+  }
+  if(players[1].health <= 0) {
+	  alert("Player 1 wins!");
+	  clearInterval(myGameArea.interval);
+	  startPlayerSelect();
+  }
 }
