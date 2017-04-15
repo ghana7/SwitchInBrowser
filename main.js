@@ -193,6 +193,7 @@ var player1char = 0;
 var player2char = 0;
 var p1down = 0;
 var p2down = 0;
+var end = 0;
 function playerSelect() {
 	var gamepads = navigator.getGamepads ? navigator.getGamepads() : (navigator.webkitGetGamepads ? navigator.webkitGetGamepads : []);
 	console.log(gamepads);
@@ -239,7 +240,7 @@ function playerSelect() {
 	player1boxes[player1char].style.borderColor = "black";
 	player2boxes[player2char].style.borderColor = "black";
 	
-	if((gamepads[0].buttons[15].value === 1 && gamepads[1].buttons[1].value === 1) {
+	if(gamepads[0].buttons[15].value === 1 && gamepads[1].buttons[1].value === 1) {
 		clearInterval(playerSelectInterval);
 		startGame(colors["black"],colors[player2char]);
 	} else if(gamepads[0].buttons[1].value === 1 && gamepads[1].buttons[15].value === 1) {
@@ -339,14 +340,17 @@ function gameLoop() {
   
   document.getElementById("score1").innerHTML = players[0].health;
   document.getElementById("score2").innerHTML = players[1].health;
-  if(players[0].health <= 0) {
-	  alert("Player 2 wins!");
+  if(end > 0) {
+	  end = 0;
+	  alert("Player " + end + " wins!");
 	  clearInterval(myGameArea.interval);
 	  startPlayerSelect();
   }
+  
+  if(players[0].health <= 0) {
+	  end = 1;
+  }
   if(players[1].health <= 0) {
-	  alert("Player 1 wins!");
-	  clearInterval(myGameArea.interval);
-	  startPlayerSelect();
+	  end = 2;
   }
 }
