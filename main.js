@@ -88,19 +88,41 @@ function component(radius, color, x, y, xvel, yvel, health) {
 		ctx.fill();
 		
 		ctx.beginPath();
-		ctx.rect(this.x - 50, this.y - 75, 100, 15);
+		ctx.rect(this.x - 50, 615, 100, 15);
 		ctx.fillStyle="#FF0000";
 		ctx.fill();
 		
 		ctx.beginPath();
-		ctx.rect(this.x - 50, this.y - 75, Math.max(this.health,0), 15);
+		ctx.rect(this.x - 50, 615, Math.max(this.health,0), 15);
 		ctx.fillStyle="#00FF00";
 		ctx.fill();
 		
 		ctx.beginPath();
-		ctx.rect(this.x - 50, this.y - 60, 20 * (5 - this.cooldown), 5);
+		ctx.rect(this.x - 50, 640, 20 * (5 - this.cooldown), 5);
 		ctx.fillStyle="#0000FF";
 		ctx.fill();
+		
+		var crack1 = new Image()
+		crack1.src = "Pictures\\crack_DMG1.png";
+		var crack2 = new Image()
+		crack2.src = "Pictures\\crack_DMG2.png";
+		var crack3 = new Image()
+		crack3.src = "Pictures\\crack_DMG3.png";
+		
+		switch(Math.round(this.health / 33)) {
+			case 3:
+				
+				break;
+			case 2:
+				ctx.drawImage(crack1,this.x - 50, this.y - 50);
+				break;
+			case 1:
+				ctx.drawImage(crack2,this.x - 50, this.y - 50);
+				break;
+			case 0:
+				ctx.drawImage(crack3,this.x - 50, this.y - 50);
+				break;
+		}
     }
 	this.checkCollision = function(otherComponent) {
 		if((this.x - otherComponent.x)*(this.x - otherComponent.x) + (this.y - otherComponent.y)*(this.y - otherComponent.y) < (this.radius + otherComponent.radius) * (this.radius + otherComponent.radius)) {
