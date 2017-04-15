@@ -5,8 +5,8 @@ var buttonDict = {bottomB:0,rightB:1,leftB:2,topB:3,leftBumper:4,rightBumper:5,m
 var myGameArea = {
     canvas : document.createElement("canvas"),
     start : function() {
-        this.canvas.width = 1000;
-        this.canvas.height = 600;
+        this.canvas.width = 1520;
+        this.canvas.height = 650;
         this.context = this.canvas.getContext("2d");
         document.body.insertBefore(this.canvas, document.body.childNodes[0]);
         this.interval = setInterval(gameLoop, 20);
@@ -16,18 +16,37 @@ var myGameArea = {
     }
 }
 
-function component(radius, color, x, y, xvel, yvel) {
+function particle(color, x, y, xvel, yvel, timer) {
+	this.x = x;
+    this.y = y;
+	this.xvel = xvel;
+	this.yvel = yvel;
+	this.color = color;
+	this.timer = timer;
+	this.update = function(){
+        ctx = myGameArea.context;
+		canvas = myGameArea.canvas;
+		this.x += this.xvel;
+		this.y += this.yvel;
+		this.timer -= 0.02;
+		ctx.beginPath();
+		ctx.arc(this.x, this.y, 2, 0, 2 * Math.PI, false);
+		ctx.fillStyle = this.color;
+		ctx.fill();
+	}
+}
+function component(radius, color, x, y, xvel, yvel, health) {
     this.radius = radius;
     this.x = x;
     this.y = y;
 	this.xvel = xvel;
 	this.yvel = yvel;
 	this.color = color;
-<<<<<<< HEAD
-	this.cooldown = 0;
-=======
-	var health = 100;
->>>>>>> origin/master
+
+	this.cooldown = 5;
+
+	this.health = health;
+	
     this.update = function(){
         ctx = myGameArea.context;
 		canvas = myGameArea.canvas;
@@ -44,15 +63,12 @@ function component(radius, color, x, y, xvel, yvel) {
 		if(this.x < this.radius) {
 			this.x = this.radius;
 			this.xvel *= -0.8;
-			health -= math.abs(xvel*3);
-			alert(health);
+			this.health -= Math.round(Math.abs(this.xvel*2));
 		}
 		if(this.x > canvas.width - this.radius) {
 			this.x = canvas.width - this.radius;
 			this.xvel *= -0.8;
-			health -= math.abs(xvel*3);
-			alert(health);
-			
+			this.health -= Math.round(Math.abs(this.xvel*2));
 			
 		}
 		this.xvel *= .95;
@@ -72,17 +88,26 @@ function component(radius, color, x, y, xvel, yvel) {
 			
 			this.xvel = myVelocity * Math.cos(THETA);
 			this.yvel = myVelocity * Math.sin(THETA);
-			
+			for(var p = 0; p < myVelocity * 5; p++) {
+				particles.push(new particle(this.color,this.x,this.y,this.xvel + Math.random() * 20 - 10, this.yvel + Math.random() * 20 - 10, 3));
+			}
 			otherComponent.xvel = otherVelocity * -Math.cos(THETA);
 			otherComponent.yvel = otherVelocity * -Math.sin(THETA);
+			for(var p = 0; p < otherVelocity * 5; p++) {
+				particles.push(new particle(otherComponent.color,otherComponent.x,otherComponent.y,otherComponent.xvel + Math.random() * 20 - 10, otherComponent.yvel + Math.random() * 10 - 5, 3));
+			}
 		}
+		
 	}
 }
 
 
 var players;
+var particles;
+
 function startGame() {
-    players = [new component(50,"red",200,500,0,0),new component(50,"blue",700,500,0,0)];
+    players = [new component(50,"red",200,500,0,0,100),new component(50,"blue",700,500,0,0,100)];
+	particles = [];
     myGameArea.start();
 }
 
@@ -116,17 +141,28 @@ function gameLoop() {
 		players[i].xvel -= 0.5;
 	}
 	players[i].cooldown -= 0.02;
+	if(players[i].cooldown < 0) {
+		players[i].cooldown = 0;
+	}
 	if(gamepads[i].buttons[1].value === 1 && players[i].cooldown === 0) {
 		players[i].cooldown = 5;
+		alert("kachow");
 		if(players[i].color === "red") {
-			players[i].xvel = 0;
-			players[i].yvel = 0;
-			alert("fuck assassins");
+			players[i].xvel *= -0.1;
+			players[i].yvel *= -0.1;
+			for(var p = 0; p < 25; p++) {
+				particles.push(new particle("yellow",players[i].x,players[i].y,players[i].xvel + Math.random() * 10 - 5, players[i].yvel + Math.random() * 10 - 5, 3));
+			}
 		}
 		if(players[i].color === "blue") {
 			players[i].xvel *= 1.5;
 			players[i].yvel *= 1.5;
+			for(var p = 0; p < 25; p++) {
+				particles.push(new particle("cyan",players[i].x,players[i].y,players[i].xvel + Math.random() * 10 - 5, players[i].yvel + Math.random() * 10 - 5, 3));
+			}
 		}
+	} else {
+		//alert(players[i].cooldown);
 	}
 	
 	
@@ -136,6 +172,14 @@ function gameLoop() {
   for(var i = 0; i < players.length; i++) {
 	  players[i].update();
   }
+  for(var p = 0; p < particles.length; p++) {
+	  particles[p].update();
+	  if(particles[p].timer < 0) {
+		  particles.splice(p,1);
+	  }
+  }
   players[0].checkCollision(players[1]); //change eventually to handle more players
-  //players[1].checkCollision(players[0]);
+  
+  document.getElementById("score1").innerHTML = players[0].health;
+  document.getElementById("score2").innerHTML = players[1].health;
 }
